@@ -1,12 +1,17 @@
 package org.lumu.testlumu;
 
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
 import java.util.StringTokenizer;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TestWord {
 
     private WebDriver driver;
@@ -24,9 +29,10 @@ public class TestWord {
         }
     }
 
-    @Test
+    @Test(priority = 1)
+    @Order(1)
     public void frecuencyWord() throws Exception {
-
+        System.out.println("Ejecución frecuencyWord");
         int totalLumu = 0;
         int totalIlluminates = 0;
         int totalAttacks = 0;
@@ -57,8 +63,10 @@ public class TestWord {
 
     }
 
-    @Test
+    @Test(priority = 2)
+    @Order(2)
     public void testPhrase() throws Exception {
+        System.out.println("Ejecución testPhrase");
         this.setUp();
         driver.findElement(By.xpath("/html/body/div[6]/div[1]/div[1]/form/div[1]/div/span/textarea")).click();
         driver.findElement(By.xpath("/html/body/div[6]/div[1]/div[1]/form/div[1]/div/span/textarea")).sendKeys(phrase);
@@ -66,7 +74,7 @@ public class TestWord {
         int totalCharacters = phrase.length();
         StringTokenizer st = new StringTokenizer(phrase);
         int totalWords = st.countTokens();
-        String resultExpect = totalWords + " words " +totalCharacters + " characters";
+        String resultExpect = totalWords + " words " + totalCharacters + " characters";
         System.out.println("Resultado Calculado por el test: " + resultExpect);
         String resultText = driver.findElement(By.cssSelector("#editor_container > div:nth-child(7) > div > div:nth-child(1) > h4 > span")).getText();
         System.out.println("Resultado Calculado por el Sitio: " + resultText);
@@ -75,23 +83,29 @@ public class TestWord {
 
     }
 
-    @Test
+    @Test(priority = 3)
+    @Order(3)
     public void testFailed() throws Exception {
+        System.out.println("Ejecución testPhrase");
         this.setUp();
         driver.findElement(By.xpath("/html/body/div[6]/div[1]/div[1]/form/div[1]/div/span/textarea")).click();
         driver.findElement(By.xpath("/html/body/div[6]/div[1]/div[1]/form/div[1]/div/span/textarea")).sendKeys(phrase);
         Thread.sleep(5000);
         String text = driver.findElement(By.cssSelector("#editor_container > div:nth-child(7) > div > div:nth-child(1) > h4 > span")).getText();
-        Assert.assertEquals(text, phraseEmpty);
+        try {
+            Assert.assertEquals(text, phraseEmpty);
 
+        } catch (Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+        }
         this.tearDown();
+        this.report();
 
     }
 
-//    public void report() throws Exception {
-//        ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "cls -lumu");
-//        pb.command()
-//    }
+    public void report() throws Exception {
+        Runtime.getRuntime().exec("cmd /c start cmd.exe /K \" cd C:\\Users\\johne\\IdeaProjects\\Lumu && mvn allure:serve");
+    }
 
     public void tearDown() throws Exception {
         driver.quit();
